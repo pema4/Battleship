@@ -23,10 +23,11 @@ public class ValidatedTextField extends TextField {
         Blend blend = new Blend();
         blend.setTopInput(blendInput);
         blend.setOpacity(0);
-        valid.addListener((v, o, n) -> blend.setOpacity(n  ? 0 : 0.3));
         setEffect(blend);
         textProperty().addListener((v, o, n) -> {
-            valid.set(validator.get() == null || validator.get().isValid(n));
+            var isValid = validator.get() == null || validator.get().isValid(n);
+            valid.set(isValid);
+            blend.setOpacity(isValid || n.isEmpty() ? 0 : 0.3);
         });
     }
 
