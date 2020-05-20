@@ -70,6 +70,6 @@
         </VBox>
     </right>
     <center>
-        <FieldBase onShot="#onShotHandler" fx:id="gameField"/>
+        <FieldBase stylesheets="@../style/field.css" onShot="#onShotHandler" fx:id="gameField"/>
     </center>
 </BorderPane>

@@ -198,10 +198,14 @@ public class GameController implements Initializable {
      * @param actionEvent mouse events.
      */
     public void startNewGameHandler(MouseEvent actionEvent) {
+        if (ocean.getShipsSunk() == 10)
+            startNewGame();
+
         var confirmation = new Alert(Alert.AlertType.CONFIRMATION);
         confirmation.setTitle("New game");
         confirmation.setHeaderText("Are you sure you want to start a new game?");
-        if (ocean.getShipsSunk() == 10 || confirmation.showAndWait().get() == ButtonType.OK)
+        var result = confirmation.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK)
             startNewGame();
     }
 

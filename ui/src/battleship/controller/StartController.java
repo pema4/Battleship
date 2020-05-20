@@ -31,14 +31,15 @@ public class StartController implements Initializable {
 
     public void serverButtonOnAction(ActionEvent event) throws IOException {
         var stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-        var loader = new FXMLLoader(getClass().getResource("/battleship/fxml/waiting.fxml"));
-        // var controller = loader.<WaitingController>getController();
+        var loader = new FXMLLoader(getClass().getResource("/fxml/waiting.fxml"));
+        var controller = new WaitingController(stage);
+        loader.setController(controller);
         stage.setScene(new Scene(loader.load()));
     }
 
     public void clientButtonOnAction(ActionEvent event) throws IOException {
         var stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-        var loader = new FXMLLoader(getClass().getResource("/battleship/fxml/connection.fxml"));
+        var loader = new FXMLLoader(getClass().getResource("/fxml/connection.fxml"));
         // var controller = loader.<WaitingController>getController();
         stage.setScene(new Scene(loader.load()));
     }

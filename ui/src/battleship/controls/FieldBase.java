@@ -1,11 +1,14 @@
 package battleship.controls;
 
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ObjectPropertyBase;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.effect.InnerShadow;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
@@ -21,7 +24,23 @@ public class FieldBase extends GridPane {
     private final int width;
     private final int height;
     private final Rectangle[][] oceanCells;
-    private final ObjectProperty<EventHandler<ShotEvent>> onShot = new SimpleObjectProperty<>();
+    private final ObjectProperty<EventHandler<ShotEvent>> onShot = new ObjectPropertyBase<>() {
+        @Override
+        protected void invalidated() {
+            setEventHandler(ShotEvent.SHOT, get());
+        }
+
+        @Override
+        public Object getBean() {
+            return FieldBase.this;
+        }
+
+        @Override
+        public String getName() {
+            return "onShot";
+        }
+    };
+
     private int lastEnteredDigit = -1;
 
     public FieldBase(int width, int height) {
@@ -29,7 +48,7 @@ public class FieldBase extends GridPane {
         this.width = width;
         this.height = height;
         oceanCells = new Rectangle[width][height];
-        getStylesheets().add("../styles/field.css");
+        createGameField();
     }
 
     public FieldBase() {
