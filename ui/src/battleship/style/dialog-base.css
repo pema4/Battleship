@@ -1,0 +1,17 @@
+@import "base.css";
+
+.root {
+    -fx-pref-width: 200px;
+    -fx-pref-height: 200px;
+    -fx-spacing: 10px;
+}
+
+.content-vbox {
+    -fx-alignment: top-center;
+    -fx-spacing: 10px;
+    -fx-padding: 5px;
+}
+
+.content-vbox .label {
+    -fx-padding: 0 0 2 0;
+}

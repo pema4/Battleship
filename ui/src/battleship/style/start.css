@@ -1,0 +1,10 @@
+@import "dialog-base.css";
+
+.root {
+    -fx-pref-height: inherit;
+}
+
+.button {
+    -fx-min-width: 70px;
+    -fx-max-width: 70px;
+}

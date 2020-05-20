@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import battleship.controls.ValidatedTextField?>
+<?import battleship.validation.IPValidator?>
+<?import battleship.validation.RegexValidator?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.*?>
+<?import battleship.validation.IntegerRangeValidator?>
+<BorderPane stylesheets="@../style/connection.css" xmlns="http://javafx.com/javafx/11.0.1"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="battleship.controller.ConnectionController">
+    <top>
+        <VBox alignment="TOP_CENTER" styleClass="content-vbox" BorderPane.alignment="CENTER">
+            <children>
+                <Label styleClass="header-label" text="Connection"/>
+                <VBox>
+                    <children>
+                        <Label text="Server IP:"/>
+                        <ValidatedTextField fx:id="ipField" promptText="127.0.0.1">
+                            <validator>
+                                <IPValidator/>
+                            </validator>
+                        </ValidatedTextField>
+                    </children>
+                </VBox>
+                <VBox layoutX="15.0" layoutY="52.0">
+                    <children>
+                        <Label text="Server Port:"/>
+                        <ValidatedTextField fx:id="portField" promptText="8888">
+                            <validator>
+                                <IntegerRangeValidator min="0" max="65536"/>
+                            </validator>
+                        </ValidatedTextField>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </top>
+    <bottom>
+        <Button mnemonicParsing="false" text="Connect" BorderPane.alignment="CENTER" fx:id="connectButton" onAction="#onConnect"/>
+    </bottom>
+</BorderPane>

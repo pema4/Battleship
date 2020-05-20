@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.Blend?>
+<?import javafx.scene.effect.ColorInput?>
+<?import javafx.scene.layout.*?>
+<?import battleship.controls.FieldBase?>
+<BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="battleship.controller.GameController">
+    <top>
+        <MenuBar BorderPane.alignment="CENTER">
+            <Menu mnemonicParsing="false">
+                <graphic>
+                    <Label text="New Game" onMouseClicked="#startNewGameHandler"/>
+                </graphic>
+            </Menu>
+            <Menu mnemonicParsing="false">
+                <graphic>
+                    <Label text="Help" onMouseClicked="#showHelpHandler"/>
+                </graphic>
+            </Menu>
+        </MenuBar>
+    </top>
+    <bottom>
+        <TextArea BorderPane.alignment="CENTER" fx:id="logTextArea" editable="false"
+                  focusTraversable="false" prefColumnCount="80"
+                  prefRowCount="10" wrapText="true" style="-fx-font-family: Consolas;">
+            <effect>
+                <Blend fx:id="logBlendEffect" opacity="0.0">
+                    <topInput>
+                        <ColorInput fx:id="logBlendEffectColor" paint="red"/>
+                    </topInput>
+                </Blend>
+            </effect>
+        </TextArea>
+    </bottom>
+    <right>
+        <VBox alignment="TOP_CENTER" BorderPane.alignment="CENTER_RIGHT">
+            <Label text="Statistics" textAlignment="CENTER" style="-fx-font-weight: bold; -fx-font-size: 18;"/>
+            <GridPane hgap="2.0" vgap="2.0">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="20.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints vgrow="SOMETIMES"/>
+                    <RowConstraints vgrow="SOMETIMES"/>
+                    <RowConstraints vgrow="SOMETIMES"/>
+                    <RowConstraints vgrow="SOMETIMES"/>
+                </rowConstraints>
+
+                <Label text="Shots" GridPane.rowIndex="0" GridPane.halignment="LEFT"/>
+                <Label text="Not Found" GridPane.rowIndex="1" GridPane.halignment="LEFT"/>
+                <Label text="Hit" GridPane.rowIndex="2" GridPane.halignment="LEFT"/>
+                <Label text="Destroyed" GridPane.rowIndex="3" GridPane.halignment="LEFT"/>
+
+                <Label fx:id="shotsCountLabel" text="0" wrapText="true" GridPane.halignment="LEFT"
+                       GridPane.columnIndex="1" style="-fx-font-family: Consolas;"/>
+                <Label fx:id="notFoundCountLabel" text="1" textAlignment="CENTER" GridPane.columnIndex="1"
+                       GridPane.halignment="LEFT" GridPane.rowIndex="1" style="-fx-font-family: Consolas;"/>
+                <Label fx:id="hitCountLabel" text="2" textAlignment="CENTER" GridPane.columnIndex="1"
+                       GridPane.halignment="LEFT" GridPane.rowIndex="2" style="-fx-font-family: Consolas;"/>
+                <Label fx:id="destroyedCountLabel" text="3" textAlignment="CENTER" GridPane.columnIndex="1"
+                       GridPane.halignment="LEFT" GridPane.rowIndex="3" style="-fx-font-family: Consolas;"/>
+            </GridPane>
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+        </VBox>
+    </right>
+    <center>
+        <FieldBase onShot="#onShotHandler" fx:id="gameField"/>
+    </center>
+</BorderPane>

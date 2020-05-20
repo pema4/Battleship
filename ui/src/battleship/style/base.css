@@ -1,0 +1,12 @@
+.root {
+    -fx-border-width: 5px;
+    -fx-border-color: wheat;
+    -fx-border-radius: 0px;
+    -fx-padding: 5px;
+}
+
+.header-label {
+    -fx-font-weight: bold;
+    -fx-font-size: 16;
+    -fx-padding: 0 0 5 0;
+}

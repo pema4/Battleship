@@ -1,0 +1,5 @@
+.root {
+    -fx-alignment: center;
+    -fx-hgap: 2px;
+    -fx-vgap: 2px;
+}

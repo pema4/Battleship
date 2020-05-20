@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+
+
+<BorderPane stylesheets="@../style/start.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="battleship.controller.StartController">
+   <center>
+      <VBox alignment="TOP_CENTER" prefHeight="133.0" prefWidth="158.0" styleClass="content-vbox" BorderPane.alignment="CENTER">
+         <children>
+            <Label alignment="TOP_LEFT" styleClass="header-label" text="Select role" />
+            <Button mnemonicParsing="false" onAction="#serverButtonOnAction" text="Server" />
+            <Button mnemonicParsing="false" onAction="#clientButtonOnAction" text="Client" />
+         </children>
+      </VBox>
+   </center>
+</BorderPane>
