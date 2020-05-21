@@ -2,6 +2,8 @@
 
 .root {
     -fx-pref-height: 150px;
+    -fx-max-height: 150px;
+    -fx-max-width: 200px;
     -fx-pref-width: 200px;
 }
 

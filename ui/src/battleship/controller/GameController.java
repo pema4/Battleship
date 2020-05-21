@@ -2,7 +2,7 @@ package battleship.controller;
 
 import battleship.basics.Ocean;
 import battleship.basics.Ship;
-import battleship.controls.FieldBase;
+import battleship.controls.Field;
 import battleship.controls.ShotEvent;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -30,7 +30,7 @@ import java.util.ResourceBundle;
  */
 public class GameController implements Initializable {
     @FXML
-    private FieldBase gameField;
+    private Field gameField;
     /**
      * This is our model - a class from the first homework.
      */
@@ -111,7 +111,7 @@ public class GameController implements Initializable {
      */
     private void handleShipNotHit(int x, int y) {
         System.out.println("Response: hit nothing.");
-        gameField.paintCell(x, y, FieldBase.EMPTY_CELL_COLOR);
+        gameField.paintCell(x, y, Field.EMPTY_CELL_COLOR);
     }
 
     /**
@@ -122,7 +122,7 @@ public class GameController implements Initializable {
      */
     private void handleShipHit(int x, int y) {
         System.out.println("Response: hit ship.");
-        gameField.paintCell(x, y, FieldBase.DESTROYED_SHIP_PART_COLOR);
+        gameField.paintCell(x, y, Field.DESTROYED_SHIP_PART_COLOR);
     }
 
     /**
@@ -135,7 +135,7 @@ public class GameController implements Initializable {
             for (int j = 0; j < (ship.isHorizontal() ? ship.getLength() : 1); ++j) {
                 int x = ship.getBowRow() + i;
                 int y = ship.getBowColumn() + j;
-                gameField.paintCell(x, y, FieldBase.DESTROYED_WHOLE_SHIP_COLOR);
+                gameField.paintCell(x, y, Field.DESTROYED_WHOLE_SHIP_COLOR);
             }
     }
 
@@ -218,7 +218,7 @@ public class GameController implements Initializable {
 
         for (int i = 0; i < 10; ++i)
             for (int j = 0; j < 10; ++j)
-                gameField.paintCell(i, j, FieldBase.UNKNOWN_CELL_COLOR);
+                gameField.paintCell(i, j, Field.UNKNOWN_CELL_COLOR);
 
         logTextArea.clear();
         System.out.println("New game started");

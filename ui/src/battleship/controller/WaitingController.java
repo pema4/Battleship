@@ -1,11 +1,13 @@
 package battleship.controller;
 
+import battleship.basics.Ocean;
 import javafx.application.Platform;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -13,10 +15,11 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class WaitingController implements Initializable {
-    private final Stage stage;
+    private final Ocean ocean;
+    public Label runningDots;
 
-    public WaitingController(Stage stage) {
-        this.stage = stage;
+    public WaitingController(Ocean ocean) {
+        this.ocean = ocean;
     }
 
     /**
@@ -36,6 +39,7 @@ public class WaitingController implements Initializable {
 
     private void showPreparingScene() {
         var loader = new FXMLLoader(getClass().getResource("/fxml/game.fxml"));
+        var stage = (Stage)runningDots.getScene().getWindow();
         loader.setControllerFactory((cls) -> new GameController());
         try {
             stage.setScene(new Scene(loader.load()));

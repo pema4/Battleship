@@ -5,7 +5,7 @@
 <?import javafx.scene.effect.Blend?>
 <?import javafx.scene.effect.ColorInput?>
 <?import javafx.scene.layout.*?>
-<?import battleship.controls.FieldBase?>
+<!--<?import battleship.controls.Field?>-->
 <BorderPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="battleship.controller.GameController">
     <top>
@@ -70,6 +70,6 @@
         </VBox>
     </right>
     <center>
-        <FieldBase stylesheets="@../style/field.css" onShot="#onShotHandler" fx:id="gameField"/>
+<!--        <Field stylesheets="@../style/field.css" onShot="#onShotHandler" fx:id="gameField"/>-->
     </center>
 </BorderPane>

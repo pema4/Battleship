@@ -7,7 +7,7 @@ public class Submarine extends Ship {
     /**
      * Class constructor.
      */
-    Submarine() {
+    public Submarine() {
         setLength(1);
     }
 

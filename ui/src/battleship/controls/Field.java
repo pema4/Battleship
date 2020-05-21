@@ -2,13 +2,10 @@ package battleship.controls;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.effect.InnerShadow;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
@@ -16,14 +13,15 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
-public class FieldBase extends GridPane {
+public class Field extends GridPane {
     public static final Paint UNKNOWN_CELL_COLOR = Color.LIGHTGRAY;
     public static final Paint EMPTY_CELL_COLOR = Color.LIGHTGREEN;
     public static final Paint DESTROYED_SHIP_PART_COLOR = Color.LIGHTBLUE;
     public static final Paint DESTROYED_WHOLE_SHIP_COLOR = Color.LIGHTPINK;
     private final int width;
     private final int height;
-    private final Rectangle[][] oceanCells;
+    private final Rectangle[][] cells;
+    private final Label[] leftLabels;
     private final ObjectProperty<EventHandler<ShotEvent>> onShot = new ObjectPropertyBase<>() {
         @Override
         protected void invalidated() {
@@ -32,7 +30,7 @@ public class FieldBase extends GridPane {
 
         @Override
         public Object getBean() {
-            return FieldBase.this;
+            return Field.this;
         }
 
         @Override
@@ -40,18 +38,19 @@ public class FieldBase extends GridPane {
             return "onShot";
         }
     };
-
     private int lastEnteredDigit = -1;
 
-    public FieldBase(int width, int height) {
+    public Field(int width, int height) {
         //alignment="CENTER" hgap="2" maxWidth="${gameField.height}" vgap="2"
         this.width = width;
         this.height = height;
-        oceanCells = new Rectangle[width][height];
+        cells = new Rectangle[width][height];
+        leftLabels = new Label[height];
         createGameField();
+        initField();
     }
 
-    public FieldBase() {
+    public Field() {
         this(10, 10);
     }
 
@@ -64,14 +63,18 @@ public class FieldBase extends GridPane {
         for (int i = 0; i < width; ++i)
             add(createGameFieldLabel(String.valueOf(i)), i + 1, 0);
 
-        for (int j = 0; j < height; ++j)
-            add(createGameFieldLabel(String.valueOf(j)), 0, j + 1);
+        for (int j = 0; j < height; ++j) {
+            var label = createGameFieldLabel(String.valueOf(j));
+            leftLabels[j] = label;
+            add(label, 0, j + 1);
+
+        }
 
         for (int i = 0; i < width; ++i) {
             for (int j = 0; j < height; ++j) {
                 Rectangle cell = createFieldCell();
                 addCellHandlers(cell, i, j);
-                oceanCells[i][j] = cell;
+                cells[i][j] = cell;
                 add(cell, i + 1, j + 1);
             }
         }
@@ -147,14 +150,19 @@ public class FieldBase extends GridPane {
                 if (lastEnteredDigit != -1) {
                     System.out.printf("Entered Y coordinate: %d\n", digit);
                     fireEvent(new ShotEvent(digit, lastEnteredDigit));
-                    oceanCells[digit][lastEnteredDigit].requestFocus();
+                    cells[digit][lastEnteredDigit].requestFocus();
+                    leftLabels[lastEnteredDigit].setTextFill(Color.BLACK);
                     lastEnteredDigit = -1;
                 } else {
                     System.out.printf("Entered X coordinate: %d\n", digit);
+                    leftLabels[digit].setTextFill(Color.RED);
                     lastEnteredDigit = digit;
                 }
-            } else
+            } else {
+                if (lastEnteredDigit != -1)
+                    leftLabels[lastEnteredDigit].setTextFill(Color.BLACK);
                 lastEnteredDigit = -1;
+            }
 
             if (code.equals(KeyCode.SPACE) || code.equals(KeyCode.ENTER))
                 fireEvent(new ShotEvent(x, y));
@@ -174,6 +182,12 @@ public class FieldBase extends GridPane {
     }
 
     public void paintCell(int x, int y, Paint paint) {
-        oceanCells[x][y].setFill(paint);
+        cells[x][y].setFill(paint);
+    }
+
+    public void initField() {
+        for (int i = 0; i < width; ++i)
+            for (int j = 0; j < height; ++j)
+                paintCell(i, j, UNKNOWN_CELL_COLOR);
     }
 }

@@ -1,0 +1,21 @@
+@import "dialog-base.css";
+
+.root {
+    -fx-min-width: 350px;
+    -fx-pref-width: 350px;
+    -fx-min-height: 500px;
+    -fx-pref-height: 500px;
+}
+
+#buttons-grid {
+    -fx-padding: 10 0 5 0;
+    -fx-hgap: 5px;
+}
+
+#buttons-grid .button {
+    -fx-pref-width: 70px;
+}
+
+#counts-grid {
+    -fx-hgap: 10px;
+}

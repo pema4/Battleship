@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.*?>
+<?import battleship.controls.Field?>
+<?import javafx.scene.effect.Blend?>
+<?import javafx.scene.effect.ColorInput?>
+<BorderPane prefHeight="200.0" prefWidth="200.0" stylesheets="@../style/preparation.css"
+            xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="battleship.controller.PreparationController">
+    <top>
+        <VBox styleClass="content-vbox" BorderPane.alignment="CENTER">
+            <children>
+                <Label styleClass="header-label" text="Placement Stage"/>
+            </children>
+        </VBox>
+    </top>
+    <center>
+        <Field fx:id="field" stylesheets="@../style/field.css" onShot="#onFieldShot" alignment="CENTER">
+            <effect>
+                <Blend fx:id="redBlendEffect" opacity="0.0" mode="SRC_ATOP">
+                    <topInput>
+                        <ColorInput paint="lightcoral" width="${field.width}" height="${field.height}"/>
+                    </topInput>
+                </Blend>
+            </effect>
+        </Field>
+    </center>
+    <bottom>
+        <VBox alignment="TOP_CENTER">
+            <Label styleClass="header-label" text="Not placed: "/>
+            <GridPane id="counts-grid" alignment="CENTER">
+                <columnConstraints>
+                    <ColumnConstraints halignment="CENTER"/>
+                    <ColumnConstraints halignment="CENTER"/>
+                    <ColumnConstraints halignment="CENTER"/>
+                    <ColumnConstraints halignment="CENTER"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints/>
+                </rowConstraints>
+                <Label fx:id="battleshipCountLabel" GridPane.columnIndex="0"/>
+                <Label fx:id="cruiserCountLabel" GridPane.columnIndex="1"/>
+                <Label fx:id="destroyerCountLabel" GridPane.columnIndex="2"/>
+                <Label fx:id="submarineCountLabel" GridPane.columnIndex="3"/>
+            </GridPane>
+            <GridPane id="buttons-grid" BorderPane.alignment="CENTER">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                    <ColumnConstraints hgrow="NEVER" halignment="RIGHT"/>
+                    <ColumnConstraints hgrow="NEVER" halignment="RIGHT"/>
+                    <ColumnConstraints hgrow="NEVER" halignment="RIGHT"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                </rowConstraints>
+                <children>
+                    <CheckBox mnemonicParsing="false" text="I am server" GridPane.valignment="CENTER"
+                            fx:id="isServerCheckbox"/>
+                    <Button mnemonicParsing="false" text="Random" GridPane.columnIndex="1"
+                            GridPane.halignment="CENTER" onAction="#onRandomButtonAction"/>
+                    <Button mnemonicParsing="false" text="Allocate" GridPane.columnIndex="2"
+                            GridPane.halignment="CENTER" onAction="#onAllocateButtonAction"/>
+                    <Button mnemonicParsing="false" text="Play" GridPane.columnIndex="3"
+                            GridPane.halignment="CENTER" onAction="#onPlayButtonAction" fx:id="playButton"/>
+                </children>
+            </GridPane>
+        </VBox>
+    </bottom>
+</BorderPane>
