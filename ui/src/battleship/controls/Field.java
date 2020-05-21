@@ -1,7 +1,9 @@
 package battleship.controls;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
@@ -38,10 +40,10 @@ public class Field extends GridPane {
             return "onShot";
         }
     };
+    private final BooleanProperty readonly = new SimpleBooleanProperty(false);
     private int lastEnteredDigit = -1;
 
     public Field(int width, int height) {
-        //alignment="CENTER" hgap="2" maxWidth="${gameField.height}" vgap="2"
         this.width = width;
         this.height = height;
         cells = new Rectangle[width][height];
@@ -52,6 +54,18 @@ public class Field extends GridPane {
 
     public Field() {
         this(10, 10);
+    }
+
+    public boolean isReadonly() {
+        return readonly.get();
+    }
+
+    public void setReadonly(boolean readonly) {
+        this.readonly.set(readonly);
+    }
+
+    public BooleanProperty readonlyProperty() {
+        return readonly;
     }
 
     /**
@@ -128,12 +142,14 @@ public class Field extends GridPane {
     private void addCellHandlers(Rectangle cell, int x, int y) {
         // Enable clicking on cells.
         cell.setOnMousePressed(mouseEvent -> {
-            fireEvent(new ShotEvent(x, y));
-            cell.requestFocus();
+            if (!readonly.get()) {
+                fireEvent(new ShotEvent(x, y));
+                cell.requestFocus();
+            }
         });
 
         // Enable traversing with keys
-        cell.setFocusTraversable(true);
+        cell.focusTraversableProperty().bind(readonly.not());
         cell.focusedProperty().addListener((observableValue, oldValue, newValue) -> {
             if (newValue)
                 cell.setStroke(Color.RED);
@@ -143,29 +159,31 @@ public class Field extends GridPane {
 
         // Enable keyboard support
         cell.setOnKeyPressed(keyEvent -> {
-            var code = keyEvent.getCode();
+            if (!readonly.get()) {
+                var code = keyEvent.getCode();
 
-            if (code.isDigitKey()) {
-                var digit = Integer.parseInt(code.getChar());
-                if (lastEnteredDigit != -1) {
-                    System.out.printf("Entered Y coordinate: %d\n", digit);
-                    fireEvent(new ShotEvent(digit, lastEnteredDigit));
-                    cells[digit][lastEnteredDigit].requestFocus();
-                    leftLabels[lastEnteredDigit].setTextFill(Color.BLACK);
-                    lastEnteredDigit = -1;
+                if (code.isDigitKey()) {
+                    var digit = Integer.parseInt(code.getChar());
+                    if (lastEnteredDigit != -1) {
+                        System.out.printf("Entered Y coordinate: %d\n", digit);
+                        fireEvent(new ShotEvent(digit, lastEnteredDigit));
+                        cells[digit][lastEnteredDigit].requestFocus();
+                        leftLabels[lastEnteredDigit].setTextFill(Color.BLACK);
+                        lastEnteredDigit = -1;
+                    } else {
+                        System.out.printf("Entered X coordinate: %d\n", digit);
+                        leftLabels[digit].setTextFill(Color.RED);
+                        lastEnteredDigit = digit;
+                    }
                 } else {
-                    System.out.printf("Entered X coordinate: %d\n", digit);
-                    leftLabels[digit].setTextFill(Color.RED);
-                    lastEnteredDigit = digit;
+                    if (lastEnteredDigit != -1)
+                        leftLabels[lastEnteredDigit].setTextFill(Color.BLACK);
+                    lastEnteredDigit = -1;
                 }
-            } else {
-                if (lastEnteredDigit != -1)
-                    leftLabels[lastEnteredDigit].setTextFill(Color.BLACK);
-                lastEnteredDigit = -1;
-            }
 
-            if (code.equals(KeyCode.SPACE) || code.equals(KeyCode.ENTER))
-                fireEvent(new ShotEvent(x, y));
+                if (code.equals(KeyCode.SPACE) || code.equals(KeyCode.ENTER))
+                    fireEvent(new ShotEvent(x, y));
+            }
         });
     }
 
