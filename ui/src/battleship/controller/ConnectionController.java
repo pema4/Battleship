@@ -1,5 +1,6 @@
 package battleship.controller;
 
+import battleship.basics.Ocean;
 import battleship.controls.ValidatedTextField;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -16,6 +17,10 @@ public class ConnectionController implements Initializable {
     private ValidatedTextField portField;
     @FXML
     private ValidatedTextField ipField;
+
+    public ConnectionController(Ocean ocean) {
+
+    }
 
     public void onConnect(ActionEvent actionEvent) {
 

@@ -8,7 +8,7 @@ public class EmptySea extends Ship {
      * Class constructor.
      */
     public EmptySea() {
-        setLength(0);
+        setLength(1);
     }
 
     /**

@@ -1,8 +1,8 @@
-package battleship.message;
+package battleship.model;
 
 import java.io.Serializable;
 
-public class ShotResponse implements Serializable {
+public class ShotResult implements Serializable {
     private static final long serialVersionUID = -867466966173959835L;
     private Response response;
 
