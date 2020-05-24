@@ -1,26 +1,44 @@
 package battleship.controls;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.control.Label;
 import javafx.scene.effect.InnerShadow;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.StrokeType;
 
+/**
+ * Элемент управления, представляющий игровое поле
+ * Выстрелы осуществляются по нажатию левой кнопки мыши
+ * Можно перемещать фокус клавишами со стрелками на клавиатуре, выстрел осуществляется нажатием Enter или Space
+ * Также можно выстрелить, введя координаты нужной клетки - сначала X, потом Y
+ */
 public class Field extends GridPane {
-    public static final Paint UNKNOWN_CELL_COLOR = Color.LIGHTGRAY;
-    public static final Paint EMPTY_CELL_COLOR = Color.LIGHTGREEN;
-    public static final Paint DESTROYED_SHIP_PART_COLOR = Color.LIGHTBLUE;
-    public static final Paint DESTROYED_WHOLE_SHIP_COLOR = Color.LIGHTPINK;
+    public static final Background UNKNOWN_CELL_BACKGROUND =
+            new Background(new BackgroundFill(Color.LIGHTGRAY, null, null));
+    public static final Background EMPTY_CELL_BACKGROUND =
+            new Background(new BackgroundFill(Color.LIGHTGREEN, null, null));
+    public static final Background DESTROYED_SHIP_PART_BACKGROUND =
+            new Background(new BackgroundFill(Color.LIGHTBLUE, null, null));
+    public static final Background DESTROYED_WHOLE_SHIP_BACKGROUND =
+            new Background(new BackgroundFill(Color.LIGHTPINK, null, null));
+    private static final BorderStrokeStyle STROKE_STYLE = new BorderStrokeStyle(StrokeType.INSIDE, null, null, 10, 0, null);
+    public static final Border TRANSPARENT_BORDER = new Border(
+            new BorderStroke(Color.TRANSPARENT, STROKE_STYLE, null, new BorderWidths(2)));
+    public static final Border RED_BORDER = new Border(
+            new BorderStroke(Color.RED, STROKE_STYLE, null, new BorderWidths(2)));
+
     private final int width;
     private final int height;
-    private final Rectangle[][] cells;
+    private final Pane[][] cells;
     private final Label[] leftLabels;
     private final ObjectProperty<EventHandler<ShotEvent>> onShot = new ObjectPropertyBase<>() {
         @Override
@@ -38,13 +56,13 @@ public class Field extends GridPane {
             return "onShot";
         }
     };
+    private final BooleanProperty readonly = new SimpleBooleanProperty(false);
     private int lastEnteredDigit = -1;
 
     public Field(int width, int height) {
-        //alignment="CENTER" hgap="2" maxWidth="${gameField.height}" vgap="2"
         this.width = width;
         this.height = height;
-        cells = new Rectangle[width][height];
+        cells = new Pane[width][height];
         leftLabels = new Label[height];
         createGameField();
         initField();
@@ -54,10 +72,37 @@ public class Field extends GridPane {
         this(10, 10);
     }
 
+    public boolean isReadonly() {
+        return readonly.get();
+    }
+
+    public void setReadonly(boolean readonly) {
+        this.readonly.set(readonly);
+    }
+
+    public BooleanProperty readonlyProperty() {
+        return readonly;
+    }
+
     /**
      * Created a game field and fills it with cells.
      */
     private void createGameField() {
+        for (int i = 0; i < width + 1; ++i) {
+            var row = new RowConstraints();
+            row.setVgrow(Priority.ALWAYS);
+            row.setFillHeight(true);
+            getRowConstraints().add(row);
+        }
+        for (int i = 0; i < height + 1; ++i) {
+            var column = new ColumnConstraints();
+            column.setHgrow(Priority.ALWAYS);
+            column.setFillWidth(true);
+            getColumnConstraints().add(column);
+        }
+        setHgap(2);
+        setVgap(2);
+
         add(createGameFieldLabel("X\\Y"), 0, 0);
 
         for (int i = 0; i < width; ++i)
@@ -72,7 +117,7 @@ public class Field extends GridPane {
 
         for (int i = 0; i < width; ++i) {
             for (int j = 0; j < height; ++j) {
-                Rectangle cell = createFieldCell();
+                Pane cell = createFieldCell();
                 addCellHandlers(cell, i, j);
                 cells[i][j] = cell;
                 add(cell, i + 1, j + 1);
@@ -98,74 +143,71 @@ public class Field extends GridPane {
      *
      * @return rectangle, representing ocean cell.
      */
-    private Rectangle createFieldCell() {
-        var cell = new Rectangle();
+    private Pane createFieldCell() {
+        var cell = new Pane();
 
         // Add transparent border around the cell (when cell is focused, border becomes red).
-        cell.setStrokeWidth(2);
-        cell.setStroke(Color.TRANSPARENT);
+        cell.setBorder(TRANSPARENT_BORDER);
 
         // Some fancy effect
         var effect = new InnerShadow();
         effect.setColor(Color.grayRgb(0, 0.1));
         cell.setEffect(effect);
 
-        // Set size (a lot of костыли there)
-        cell.widthProperty().bind(widthProperty().divide(width).subtract(10));
-        cell.heightProperty().bind(heightProperty().divide(height).subtract(10));
-        cell.widthProperty().bind(cell.heightProperty());
-
         return cell;
     }
 
     /**
      * Sets needed handlers for given cell events.
-     *
-     * @param cell Rectangle, representing ocean cell.
+     *  @param cell Rectangle, representing ocean cell.
      * @param x    first coordinate of the cell.
      * @param y    second coordinate of the cell.
      */
-    private void addCellHandlers(Rectangle cell, int x, int y) {
+    private void addCellHandlers(Pane cell, int x, int y) {
         // Enable clicking on cells.
         cell.setOnMousePressed(mouseEvent -> {
-            fireEvent(new ShotEvent(x, y));
-            cell.requestFocus();
+            if (!readonly.get()) {
+                fireEvent(new ShotEvent(x, y));
+                cell.requestFocus();
+            }
         });
 
         // Enable traversing with keys
-        cell.setFocusTraversable(true);
+        cell.focusTraversableProperty().bind(readonly.not());
         cell.focusedProperty().addListener((observableValue, oldValue, newValue) -> {
             if (newValue)
-                cell.setStroke(Color.RED);
+                cell.setBorder(RED_BORDER);
             else
-                cell.setStroke(Color.TRANSPARENT);
+                cell.setBorder(TRANSPARENT_BORDER);
         });
 
         // Enable keyboard support
         cell.setOnKeyPressed(keyEvent -> {
-            var code = keyEvent.getCode();
+            if (!readonly.get()) {
+                var code = keyEvent.getCode();
 
-            if (code.isDigitKey()) {
-                var digit = Integer.parseInt(code.getChar());
-                if (lastEnteredDigit != -1) {
-                    System.out.printf("Entered Y coordinate: %d\n", digit);
-                    fireEvent(new ShotEvent(digit, lastEnteredDigit));
-                    cells[digit][lastEnteredDigit].requestFocus();
-                    leftLabels[lastEnteredDigit].setTextFill(Color.BLACK);
-                    lastEnteredDigit = -1;
+                if (code.isDigitKey()) {
+                    var digit = Integer.parseInt(code.getChar());
+                    if (lastEnteredDigit != -1) {
+                        System.out.printf("Entered Y coordinate: %d\n", digit);
+                        fireEvent(new ShotEvent(digit, lastEnteredDigit));
+                        cells[digit][lastEnteredDigit].requestFocus();
+                        leftLabels[lastEnteredDigit].setTextFill(Color.BLACK);
+                        lastEnteredDigit = -1;
+                    } else {
+                        System.out.printf("Entered X coordinate: %d\n", digit);
+                        leftLabels[digit].setTextFill(Color.RED);
+                        lastEnteredDigit = digit;
+                    }
                 } else {
-                    System.out.printf("Entered X coordinate: %d\n", digit);
-                    leftLabels[digit].setTextFill(Color.RED);
-                    lastEnteredDigit = digit;
+                    if (lastEnteredDigit != -1)
+                        leftLabels[lastEnteredDigit].setTextFill(Color.BLACK);
+                    lastEnteredDigit = -1;
                 }
-            } else {
-                if (lastEnteredDigit != -1)
-                    leftLabels[lastEnteredDigit].setTextFill(Color.BLACK);
-                lastEnteredDigit = -1;
-            }
 
-            if (code.equals(KeyCode.SPACE) || code.equals(KeyCode.ENTER))
-                fireEvent(new ShotEvent(x, y));
+                if (code.equals(KeyCode.SPACE) || code.equals(KeyCode.ENTER))
+                    fireEvent(new ShotEvent(x, y));
+            }
         });
     }
 
@@ -181,13 +223,13 @@ public class Field extends GridPane {
         return onShot;
     }
 
-    public void paintCell(int x, int y, Paint paint) {
-        cells[x][y].setFill(paint);
+    public void paintCell(int x, int y, Background background) {
+        cells[x][y].setBackground(background);
     }
 
     public void initField() {
         for (int i = 0; i < width; ++i)
             for (int j = 0; j < height; ++j)
-                paintCell(i, j, UNKNOWN_CELL_COLOR);
+                paintCell(i, j, UNKNOWN_CELL_BACKGROUND);
     }
 }

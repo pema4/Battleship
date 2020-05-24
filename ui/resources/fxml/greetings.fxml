@@ -1,27 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.VBox?>
-
-
-<BorderPane stylesheets="@/style/greetings.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
-   <bottom>
-      <Button mnemonicParsing="false" text="Next" BorderPane.alignment="CENTER" />
-   </bottom>
-   <top>
-      <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" styleClass="content-vbox" BorderPane.alignment="CENTER">
-         <children>
-            <Label styleClass="header-label" text="Who are you?" />
+<?import javafx.scene.layout.*?>
+<?import battleship.controls.ValidatedTextField?>
+<?import battleship.validation.NotBlankValidator?>
+<?import javafx.scene.control.CheckBox?>
+<BorderPane stylesheets="@../style/greetings.css" xmlns="http://javafx.com/javafx/11.0.1"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="battleship.controllers.GreetingsController">
+    <bottom>
+        <GridPane id="buttons-grid" BorderPane.alignment="CENTER">
+            <columnConstraints>
+                <ColumnConstraints halignment="CENTER" hgrow="ALWAYS"/>
+                <ColumnConstraints halignment="CENTER" hgrow="ALWAYS"/>
+            </columnConstraints>
+            <Button mnemonicParsing="false" text="OK" fx:id="okButton" onAction="#onOkButtonAction" GridPane.columnIndex="0"/>
+            <Button mnemonicParsing="false" text="Cancel" GridPane.columnIndex="1" onAction="#onCancelButtonAction"/>
+        </GridPane>
+    </bottom>
+    <top>
+        <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+              styleClass="content-vbox" BorderPane.alignment="CENTER">
+            <Label styleClass="header-label" text="Who are you?"/>
             <VBox>
-               <children>
-                  <Label text="Enter your name:" />
-                  <TextField fx:id="nameField" promptText="java_lover" />
-               </children>
+                <Label text="Enter your name:"/>
+                <ValidatedTextField fx:id="nameField" promptText="java_lover">
+                    <validator>
+                        <NotBlankValidator/>
+                    </validator>
+                </ValidatedTextField>
             </VBox>
-         </children>
-      </VBox>
-   </top>
+        </VBox>
+    </top>
 </BorderPane>

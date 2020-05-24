@@ -10,7 +10,7 @@
 <?import javafx.scene.effect.ColorInput?>
 <BorderPane prefHeight="200.0" prefWidth="200.0" stylesheets="@../style/preparation.css"
             xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="battleship.controller.PreparationController">
+            fx:controller="battleship.controllers.PreparationController">
     <top>
         <VBox styleClass="content-vbox" BorderPane.alignment="CENTER">
             <children>
@@ -19,15 +19,18 @@
         </VBox>
     </top>
     <center>
-        <Field fx:id="field" stylesheets="@../style/field.css" onShot="#onFieldShot" alignment="CENTER">
-            <effect>
-                <Blend fx:id="redBlendEffect" opacity="0.0" mode="SRC_ATOP">
-                    <topInput>
-                        <ColorInput paint="lightcoral" width="${field.width}" height="${field.height}"/>
-                    </topInput>
-                </Blend>
-            </effect>
-        </Field>
+        <StackPane fx:id="fieldContainer" >
+            <Field fx:id="field" onShot="#onFieldShot" alignment="CENTER">
+                <effect>
+                    <Blend fx:id="redBlendEffect" opacity="0.0" mode="SRC_ATOP">
+                        <topInput>
+                            <ColorInput paint="lightcoral" width="${field.width}" height="${field.height}"/>
+                        </topInput>
+                    </Blend>
+                </effect>
+            </Field>
+
+        </StackPane>
     </center>
     <bottom>
         <VBox alignment="TOP_CENTER">

@@ -1,0 +1,15 @@
+@import "base.css";
+
+.header-label {
+    -fx-padding: 0 0 0 0;
+}
+
+.root {
+    -fx-pref-width: 500px;
+    -fx-pref-height: 520px;
+}
+
+.bottom-vbox {
+    -fx-spacing: 10px;
+    -fx-padding: 0 5 5 5;
+}

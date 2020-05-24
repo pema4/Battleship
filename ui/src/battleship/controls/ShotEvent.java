@@ -3,6 +3,9 @@ package battleship.controls;
 import javafx.event.Event;
 import javafx.event.EventType;
 
+/**
+ * Событие выстрела по полю
+ */
 public class ShotEvent extends Event {
     public static final EventType<ShotEvent> SHOT = new EventType<>(Event.ANY, "SHOT");
     private final int x;
