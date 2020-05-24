@@ -1,9 +1,12 @@
 package battleship.basics;
 
+import java.io.Serializable;
+
 /**
  * An abstract ship.
  */
-public abstract class Ship {
+public abstract class Ship implements Serializable {
+    private static final long serialVersionUID = 3570813119888438571L;
     private boolean horizontal;
     private boolean[] hit = new boolean[4];
     private int bowRow;

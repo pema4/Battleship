@@ -1,4 +1,4 @@
-package battleship.model;
+package battleship.models;
 
 public enum Role {
     CLIENT,

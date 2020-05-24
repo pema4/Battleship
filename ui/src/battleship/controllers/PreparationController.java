@@ -1,12 +1,13 @@
-package battleship.controller;
+package battleship.controllers;
 
 import battleship.basics.*;
 import battleship.controls.Field;
 import battleship.controls.ShotEvent;
-import battleship.model.Role;
+import battleship.models.Role;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -20,14 +21,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.effect.Blend;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-
-import static javafx.scene.layout.Region.USE_PREF_SIZE;
 
 public class PreparationController implements Initializable {
     private final Role startingRole;
@@ -36,6 +36,8 @@ public class PreparationController implements Initializable {
     public Label cruiserCountLabel;
     public Label destroyerCountLabel;
     public Label submarineCountLabel;
+    @FXML
+    private StackPane fieldContainer;
     private Ocean ocean = new Ocean();
     private int prevShotX = -1;
     private int prevShotY = -1;
@@ -69,6 +71,12 @@ public class PreparationController implements Initializable {
         var c = shipFactory.destroyerCount.isNotEqualTo(0);
         var d = shipFactory.submarineCount.isNotEqualTo(0);
         playButton.disableProperty().bind(a.or(b).or(c).or(d));
+
+        var maxLength = Bindings.min(fieldContainer.maxHeightProperty(), fieldContainer.maxWidthProperty());
+        field.maxHeightProperty().bind(maxLength);
+        field.minHeightProperty().bind(maxLength);
+        field.maxWidthProperty().bind(maxLength);
+        field.minWidthProperty().bind(maxLength);
     }
 
     public void onAllocateButtonAction(ActionEvent actionEvent) {
@@ -82,21 +90,23 @@ public class PreparationController implements Initializable {
         var stage = (Stage) scene.getWindow();
         Scene newScene;
         if (isServerCheckbox.isSelected()) {
-            var loader = new FXMLLoader(getClass().getResource("/fxml/waiting.fxml"));
+            var loader = new FXMLLoader(getClass().getResource("/fxml/serverSettings.fxml"));
             loader.setControllerFactory(cls ->
-                    new WaitingController(ocean));
+                    new ServerSettingsController(ocean));
             newScene = new Scene(loader.load());
         } else {
-            var loader = new FXMLLoader(getClass().getResource("/fxml/connection.fxml"));
+            var loader = new FXMLLoader(getClass().getResource("/fxml/clientSettings.fxml"));
             loader.setControllerFactory(cls ->
-                    new ConnectionController(ocean));
+                    new ClientSettingsController(ocean));
             newScene = new Scene(loader.load());
         }
         stage.setScene(newScene);
+        stage.setMinHeight(0);
+        stage.setMinWidth(0);
         stage.sizeToScene();
         stage.setResizable(false);
-        stage.setMinHeight(USE_PREF_SIZE);
-        stage.setMaxHeight(USE_PREF_SIZE);
+//        stage.setMinHeight(USE_PREF_SIZE);
+//        stage.setMaxHeight(USE_PREF_SIZE);
     }
 
     public void onFieldShot(ShotEvent event) {
@@ -104,7 +114,7 @@ public class PreparationController implements Initializable {
             if (ocean.getShipAt(event.getX(), event.getY()) instanceof EmptySea) {
                 prevShotX = event.getX();
                 prevShotY = event.getY();
-                field.paintCell(prevShotX, prevShotY, Field.DESTROYED_SHIP_PART_COLOR);
+                field.paintCell(prevShotX, prevShotY, Field.EMPTY_CELL_BACKGROUND);
             } else {
                 removeShip(event.getX(), event.getY());
             }
@@ -112,9 +122,8 @@ public class PreparationController implements Initializable {
             try {
                 placeShip(prevShotX, prevShotY, event.getX(), event.getY());
             } catch (IllegalArgumentException ex) {
-                System.out.println(ex.getMessage());
                 playErrorAnimation();
-                field.paintCell(prevShotX, prevShotY, Field.UNKNOWN_CELL_COLOR);
+                field.paintCell(prevShotX, prevShotY, Field.UNKNOWN_CELL_BACKGROUND);
             }
             prevShotX = -1;
             prevShotY = -1;
@@ -130,7 +139,7 @@ public class PreparationController implements Initializable {
             for (int j = 0; j < (ship.isHorizontal() ? length : 1); ++j) {
                 var emptySea = new EmptySea();
                 emptySea.placeShipAt(row + i, column + j, true, ocean);
-                field.paintCell(row + i, column + j, Field.UNKNOWN_CELL_COLOR);
+                field.paintCell(row + i, column + j, Field.UNKNOWN_CELL_BACKGROUND);
             }
         shipFactory.updateCounters(length, 1);
     }
@@ -151,7 +160,7 @@ public class PreparationController implements Initializable {
         ship.placeShipAt(row, column, isHorizontal, ocean);
         for (int i = 0; i < (isHorizontal ? 1 : length); ++i)
             for (int j = 0; j < (isVertical ? 1 : length); ++j)
-                field.paintCell(row + i, column + j, Field.EMPTY_CELL_COLOR);
+                field.paintCell(row + i, column + j, Field.DESTROYED_SHIP_PART_BACKGROUND);
 
         shipFactory.updateCounters(length, -1);
     }
@@ -175,16 +184,20 @@ public class PreparationController implements Initializable {
         for (int i = 0; i < Ocean.OCEAN_WIDTH; ++i)
             for (int j = 0; j < Ocean.OCEAN_HEIGHT; ++j)
                 if (ocean.getShipAt(i, j) instanceof EmptySea)
-                    field.paintCell(i, j, Field.UNKNOWN_CELL_COLOR);
+                    field.paintCell(i, j, Field.UNKNOWN_CELL_BACKGROUND);
                 else
-                    field.paintCell(i, j, Field.EMPTY_CELL_COLOR);
+                    field.paintCell(i, j, Field.DESTROYED_SHIP_PART_BACKGROUND);
     }
 
     private static class ShipFactory {
-        private final IntegerProperty battleshipCount = new SimpleIntegerProperty(1);
-        private final IntegerProperty cruiserCount = new SimpleIntegerProperty(2);
-        private final IntegerProperty destroyerCount = new SimpleIntegerProperty(3);
-        private final IntegerProperty submarineCount = new SimpleIntegerProperty(4);
+        private final IntegerProperty battleshipCount = new SimpleIntegerProperty(0);
+        private final IntegerProperty cruiserCount = new SimpleIntegerProperty(0);
+        private final IntegerProperty destroyerCount = new SimpleIntegerProperty(1);
+        private final IntegerProperty submarineCount = new SimpleIntegerProperty(0);
+//        private final IntegerProperty battleshipCount = new SimpleIntegerProperty(1);
+//        private final IntegerProperty cruiserCount = new SimpleIntegerProperty(2);
+//        private final IntegerProperty destroyerCount = new SimpleIntegerProperty(3);
+//        private final IntegerProperty submarineCount = new SimpleIntegerProperty(4);
 
         public void init() {
             battleshipCount.set(1);

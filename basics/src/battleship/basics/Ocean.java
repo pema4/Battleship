@@ -164,7 +164,7 @@ public class Ocean {
      * @return if the game is over (all ships are sunk).
      */
     public boolean isGameOver() {
-        return getShipsSunk() == 10;
+        return getShipsSunk() == 1;
     }
 
     /**

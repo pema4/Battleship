@@ -20,11 +20,6 @@ public class Main extends Application {
         primaryStage.setTitle("Battleship");
         primaryStage.setScene(new Scene(root));
         primaryStage.setResizable(false);
-        //primaryStage.initStyle(StageStyle.UTILITY);
-
-        //primaryStage.maxHeightProperty().bind(primaryStage.widthProperty().add(130));
-        //primaryStage.minHeightProperty().bind(primaryStage.widthProperty().add(130));
-        // как я понял, в javafx нельзя оставить только растягивание по диагонали. приходится делать как-то так
 
         primaryStage.show();
     }

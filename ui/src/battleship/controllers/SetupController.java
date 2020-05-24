@@ -1,4 +1,4 @@
-package battleship.controller;
+package battleship.controllers;
 
 public class SetupController {
 }

@@ -1,6 +1,6 @@
-package battleship.controller;
+package battleship.controllers;
 
-import battleship.model.Role;
+import battleship.models.Role;
 import javafx.beans.property.ObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;

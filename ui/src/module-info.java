@@ -6,7 +6,7 @@ module battleship.ui {
 
     exports battleship;
 
-    opens battleship.controller to javafx.fxml;
+    opens battleship.controllers to javafx.fxml;
     opens battleship.controls to javafx.fxml;
     opens battleship.validation to javafx.fxml;
 }

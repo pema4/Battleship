@@ -8,11 +8,11 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.*?>
 <BorderPane stylesheets="@../style/connection.css" xmlns="http://javafx.com/javafx/11.0.1"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="battleship.controller.ConnectionController">
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="battleship.controllers.ClientSettingsController">
     <top>
         <VBox alignment="TOP_CENTER" styleClass="content-vbox" BorderPane.alignment="CENTER">
             <children>
-                <Label styleClass="header-label" text="Connection"/>
+                <Label styleClass="header-label" text="Connect"/>
                 <VBox>
                     <children>
                         <Label text="Server IP:"/>
