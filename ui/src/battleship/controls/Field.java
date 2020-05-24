@@ -15,6 +15,12 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.StrokeType;
 
+/**
+ * Элемент управления, представляющий игровое поле
+ * Выстрелы осуществляются по нажатию левой кнопки мыши
+ * Можно перемещать фокус клавишами со стрелками на клавиатуре, выстрел осуществляется нажатием Enter или Space
+ * Также можно выстрелить, введя координаты нужной клетки - сначала X, потом Y
+ */
 public class Field extends GridPane {
     public static final Background UNKNOWN_CELL_BACKGROUND =
             new Background(new BackgroundFill(Color.LIGHTGRAY, null, null));

@@ -10,6 +10,10 @@ import javafx.scene.effect.ColorInput;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
+/**
+ * Элемент управления TextField с пользовательской валидацией
+ * Если значение неправильное - поле подсвечивается красным цветом
+ */
 public class ValidatedTextField extends TextField {
     private final ColorInput blendInput = new ColorInput();
     private final ReadOnlyBooleanWrapper valid = new ReadOnlyBooleanWrapper(false);

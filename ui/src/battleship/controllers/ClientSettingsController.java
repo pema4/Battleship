@@ -21,6 +21,9 @@ import java.net.Socket;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+/**
+ * Контроллер для экрана подключения к серверу
+ */
 public class ClientSettingsController implements Initializable {
     private final Ocean ocean;
     private final ConnectionService connection = new ConnectionService();
@@ -45,8 +48,7 @@ public class ClientSettingsController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        connectButton.disableProperty().bind(
-                portField.validProperty().not().or(ipField.validProperty().not()));
+        connectButton.disableProperty().bind(ipField.validProperty().not());
 
         connection.setOnSucceeded(t -> showGreetings(connection.getValue()));
         connection.setOnFailed(t -> showError());
@@ -64,6 +66,8 @@ public class ClientSettingsController implements Initializable {
 
     private void showGreetings(Socket server) {
         var stage = (Stage)connectButton.getScene().getWindow();
+
+        // сокет закрывается автоматически, когда закрывается приложение.
         stage.setOnHidden(e -> {
             try {
                 server.close();

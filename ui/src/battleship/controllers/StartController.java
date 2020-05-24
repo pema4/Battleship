@@ -13,21 +13,12 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class StartController implements Initializable {
+/**
+ * Контроллер стартового экрана
+ * Этот экран показывается, если приложение не запущено с аргументом, указывающим роль
+ */
+public class StartController {
     private ObjectProperty<Role> selectedRole;
-
-    /**
-     * Called to initialize a controller after its root element has been
-     * completely processed.
-     *
-     * @param location  The location used to resolve relative paths for the root object, or
-     *                  {@code null} if the location is not known.
-     * @param resources The resources used to localize the root object, or {@code null} if
-     */
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-
-    }
 
     public void serverButtonOnAction(ActionEvent event) throws IOException {
         var stage = (Stage)((Node)event.getSource()).getScene().getWindow();

@@ -7,6 +7,10 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * Сервис, ожидающие подключения клиента в отдельном потоке
+ * Сервисы позволяют задавать действия, выполняемые в UI потоке после своего успешного завершения/ошибки
+ */
 public class AcceptConnectionService extends Service<Socket> {
     private int port;
     private ServerSocket serverSocket;
@@ -25,15 +29,15 @@ public class AcceptConnectionService extends Service<Socket> {
             @Override
             protected Socket call() throws Exception {
                 serverSocket = new ServerSocket(port);
-                var client = serverSocket.accept();
                 AcceptConnectionService.this.serverSocket = serverSocket;
-                return client;
+                return serverSocket.accept();
             }
 
             @Override
             public boolean cancel(boolean mayInterruptIfRunning) {
                 if (mayInterruptIfRunning)
                     try {
+                        // закрытие сокета пробудит заблокированный поток
                         serverSocket.close();
                         return true;
                     } catch (IOException ignored) {

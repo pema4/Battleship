@@ -22,8 +22,12 @@ import java.net.Socket;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+/**
+ * Контроллер для экрана с настройками сервера
+ */
 public class ServerSettingsController implements Initializable {
     private final Ocean ocean;
+    // Логика ожидания подключения вынесена в отдельный сервис, который будет выполняться в другом потоке
     private final AcceptConnectionService connection = new AcceptConnectionService();
 
     @FXML
@@ -35,14 +39,6 @@ public class ServerSettingsController implements Initializable {
         this.ocean = ocean;
     }
 
-    /**
-     * Called to initialize a controller after its root element has been
-     * completely processed.
-     *
-     * @param location  The location used to resolve relative paths for the root object, or
-     *                  {@code null} if the location is not known.
-     * @param resources The resources used to localize the root object, or {@code null} if
-     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         connectButton.disableProperty().bind(portField.validProperty().not());
@@ -55,12 +51,22 @@ public class ServerSettingsController implements Initializable {
                         .otherwise("Serve"));
     }
 
+    /**
+     * Выводит сообщение об ошибке
+     */
     private void showError() {
         new Alert(Alert.AlertType.ERROR, "can't serve", ButtonType.OK);
     }
 
+    /**
+     * Меняет текущий экран на экран с приветсвием
+     * @param server сокет сервера
+     * @param client сокет клиента
+     */
     private void showGreetings(ServerSocket server, Socket client) {
         var stage = (Stage)connectButton.getScene().getWindow();
+
+        // после закрытия приложения ресурсы будут освобождены
         stage.setOnHidden(e -> {
             try {
                 server.close();
@@ -81,6 +87,11 @@ public class ServerSettingsController implements Initializable {
         }
     }
 
+    /**
+     * Обработчик нажатия кнопки
+     *
+     * @param actionEvent не используется
+     */
     @FXML
     private void onConnect(ActionEvent actionEvent) {
         if (connection.isRunning())

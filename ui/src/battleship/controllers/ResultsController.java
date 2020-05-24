@@ -9,6 +9,9 @@ import javafx.scene.control.Label;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+/**
+ * Контроллер для экрана с результатами
+ */
 public class ResultsController implements Initializable {
     public Label winnerNameLabel;
     public Label myShotsLabel;

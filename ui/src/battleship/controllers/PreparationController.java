@@ -29,6 +29,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+/**
+ * Контроллер для экрана расстановки кораблей
+ */
 public class PreparationController implements Initializable {
     private final Role startingRole;
     private final ShipFactory shipFactory = new ShipFactory();
@@ -79,6 +82,11 @@ public class PreparationController implements Initializable {
         field.minWidthProperty().bind(maxLength);
     }
 
+    /**
+     * Очищает поле от кораблей.
+     *
+     * @param actionEvent не используется
+     */
     public void onAllocateButtonAction(ActionEvent actionEvent) {
         ocean = new Ocean();
         field.initField();
@@ -105,10 +113,15 @@ public class PreparationController implements Initializable {
         stage.setMinWidth(0);
         stage.sizeToScene();
         stage.setResizable(false);
-//        stage.setMinHeight(USE_PREF_SIZE);
-//        stage.setMaxHeight(USE_PREF_SIZE);
     }
 
+    /**
+     * Обработчик "выстрела" по полю
+     * Выстрел по кораблю "стирает" его
+     * Первый выстрел задаёт один конец корабля, второй выстрел - другой конец корабля
+     *
+     * @param event куда выстрелил пользователь
+     */
     public void onFieldShot(ShotEvent event) {
         if (prevShotX == -1) {
             if (ocean.getShipAt(event.getX(), event.getY()) instanceof EmptySea) {
@@ -130,6 +143,12 @@ public class PreparationController implements Initializable {
         }
     }
 
+    /**
+     * Вызывается при удалении корабля, расположенного по заданным координатам
+     *
+     * @param x номер строки
+     * @param y номер столбца
+     */
     private void removeShip(int x, int y) {
         var ship = ocean.getShipAt(x, y);
         var row = ship.getBowRow();
@@ -144,6 +163,14 @@ public class PreparationController implements Initializable {
         shipFactory.updateCounters(length, 1);
     }
 
+    /**
+     * Вызывается для расположения корабля по заданным координатам
+     *
+     * @param x1 номер строки начала корабля
+     * @param y1 номер столбца начала корабля
+     * @param x2 номер строки конца корабля
+     * @param y2 номер столбца конца корабля
+     */
     private void placeShip(int x1, int y1, int x2, int y2) {
         var isHorizontal = y1 != y2;
         var isVertical = x1 != x2;
@@ -165,6 +192,9 @@ public class PreparationController implements Initializable {
         shipFactory.updateCounters(length, -1);
     }
 
+    /**
+     * Метод, воспроизводящий анимацию ошибки (поле подсвечивается красным цветом)
+     */
     private void playErrorAnimation() {
         var animation = new Timeline(
                 new KeyFrame(Duration.seconds(0.00), new KeyValue(redBlendEffect.opacityProperty(), 0.2)),
@@ -173,6 +203,11 @@ public class PreparationController implements Initializable {
         animation.play();
     }
 
+    /**
+     * Заполняет поле случайным образом
+     *
+     * @param actionEvent не используется
+     */
     public void onRandomButtonAction(ActionEvent actionEvent) {
         ocean = new Ocean();
         ocean.placeAllShipsRandomly();
@@ -180,6 +215,9 @@ public class PreparationController implements Initializable {
         shipFactory.initEmpty();
     }
 
+    /**
+     * Перерисовывает поле для текущего объекта Ocean
+     */
     private void redrawField() {
         for (int i = 0; i < Ocean.OCEAN_WIDTH; ++i)
             for (int j = 0; j < Ocean.OCEAN_HEIGHT; ++j)
@@ -189,16 +227,18 @@ public class PreparationController implements Initializable {
                     field.paintCell(i, j, Field.DESTROYED_SHIP_PART_BACKGROUND);
     }
 
+    /**
+     * Вспомогательный класс, используемый для создания кораблей заданного размера
+     */
     private static class ShipFactory {
-        private final IntegerProperty battleshipCount = new SimpleIntegerProperty(0);
-        private final IntegerProperty cruiserCount = new SimpleIntegerProperty(0);
-        private final IntegerProperty destroyerCount = new SimpleIntegerProperty(1);
-        private final IntegerProperty submarineCount = new SimpleIntegerProperty(0);
-//        private final IntegerProperty battleshipCount = new SimpleIntegerProperty(1);
-//        private final IntegerProperty cruiserCount = new SimpleIntegerProperty(2);
-//        private final IntegerProperty destroyerCount = new SimpleIntegerProperty(3);
-//        private final IntegerProperty submarineCount = new SimpleIntegerProperty(4);
+        private final IntegerProperty battleshipCount = new SimpleIntegerProperty(1);
+        private final IntegerProperty cruiserCount = new SimpleIntegerProperty(2);
+        private final IntegerProperty destroyerCount = new SimpleIntegerProperty(3);
+        private final IntegerProperty submarineCount = new SimpleIntegerProperty(4);
 
+        /**
+         * Сбрасывает счётчики неиспользуемых кораблей
+         */
         public void init() {
             battleshipCount.set(1);
             cruiserCount.set(2);
@@ -206,6 +246,9 @@ public class PreparationController implements Initializable {
             submarineCount.set(4);
         }
 
+        /**
+         * Обнуляет счётчики неиспользованных кораблей
+         */
         public void initEmpty() {
             battleshipCount.set(0);
             cruiserCount.set(0);
@@ -213,6 +256,13 @@ public class PreparationController implements Initializable {
             submarineCount.set(0);
         }
 
+        /**
+         * Создаёт корабль заданного размера
+         * Этот метод не изменяет счётчики
+         *
+         * @param length размер корабля
+         * @return корабль нужного размера
+         */
         public Ship createShip(int length) {
             switch (length) {
                 case 1:
@@ -238,6 +288,12 @@ public class PreparationController implements Initializable {
             throw new IllegalArgumentException("Unable to create ship");
         }
 
+        /**
+         * Изменяет счётчик кораблей заданного размера на заданную величину
+         *
+         * @param length размер корабля
+         * @param delta на сколько изменить счётчик
+         */
         public void updateCounters(int length, int delta) {
             switch (length) {
                 case 1:

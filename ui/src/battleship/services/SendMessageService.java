@@ -6,6 +6,10 @@ import javafx.concurrent.Task;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
+/**
+ * Сервис, отправляющий объект сопернику в отдельном потоке и возвращающий отправленное сообщение
+ * Сервисы позволяют задавать действия, выполняемые в UI потоке после своего успешного завершения/ошибки
+ */
 public class SendMessageService extends Service<Object> {
     private final ObjectOutputStream outputStream;
     private Object message;
@@ -25,12 +29,8 @@ public class SendMessageService extends Service<Object> {
             private final Object message = SendMessageService.this.message;
             @Override
             protected Object call() throws Exception {
-                try {
-                    outputStream.writeObject(message);
-                    return message;
-                } catch (IOException ex) {
-                    throw ex;
-                }
+                outputStream.writeObject(message);
+                return message;
             }
         };
     }

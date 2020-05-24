@@ -4,15 +4,15 @@ import battleship.basics.Ship;
 
 import java.io.Serializable;
 
+/**
+ * Сообщение, оправляемое игроку, запрашивающему выстрел
+ * Замечание: корабль отправляется только тогда, когда он потоплен. Так что игроки не могут смухлевать
+ */
 public class ShotResponse implements Serializable {
     private static final long serialVersionUID = 6530813119888438577L;
     private final Type type;
-    private final Ship sunkShip;
+    private final Ship sunkShip; // корабль отправляется только тогда, когда он потоплен
     private final ShotRequest request;
-
-    public ShotResponse() {
-        this(null, null, null);
-    }
 
     private ShotResponse(Type type, ShotRequest request, Ship sunkShip) {
         this.request = request;

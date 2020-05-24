@@ -5,6 +5,10 @@ import javafx.concurrent.Task;
 
 import java.net.Socket;
 
+/**
+ * Сервис, выполняющий подключение к серверу в отдельном потоке
+ * Сервисы позволяют задавать действия, выполняемые в UI потоке после своего успешного завершения/ошибки
+ */
 public class ConnectionService extends Service<Socket> {
     private String host;
     private int port;

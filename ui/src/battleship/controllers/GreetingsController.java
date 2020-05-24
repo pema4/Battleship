@@ -22,6 +22,9 @@ import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+/**
+ * Контроллер для экрана приветствия
+ */
 public class GreetingsController implements Initializable {
     private final Ocean ocean;
     private final ObjectInputStream inputStream;
@@ -29,9 +32,8 @@ public class GreetingsController implements Initializable {
     private final boolean isMyTurn;
     private final ReceiveMessageService receiveMessageService;
     private final SendMessageService sendMessageService;
-    private String partnerName;
     public Button okButton;
-
+    private String partnerName;
     @FXML
     private ValidatedTextField nameField;
     private String myName;
@@ -57,39 +59,67 @@ public class GreetingsController implements Initializable {
         receiveMessageService.start();
     }
 
+    /**
+     * Метод, вызываемый при получении сообщения от другого игрока
+     *
+     * @param message полученное сообщение
+     */
     private void onMessageReceived(Object message) {
+        // Если пришла строка, запоминаем её - это имя соперника
         if (message instanceof String) {
-            partnerName = (String)message;
+            partnerName = (String) message;
             if (myName != null) {
                 sendMessageService.send(new GameStart());
                 return;
             }
+            // Если пришёл GameStart - можно начинать игру, игрок и соперник знают имена друг друга
         } else if (message instanceof GameStart) {
             showGame(myName, partnerName);
             return;
         }
 
+        // Запускаем сервис заново, чтобы слушать другие сообщения
         receiveMessageService.restart();
     }
 
+    /**
+     * Метод, вызываемый после успешной отправки сообщения сопернику
+     *
+     * @param message отправленное сообщение
+     */
     private void onMessageSent(Object message) {
+        // Запоминаем наше имя, которое получил соперник
         if (message instanceof String) {
-            myName = (String)message;
+            myName = (String) message;
+        // После успешной отправки GameStart можно начинать игру
         } else if (message instanceof GameStart) {
             showGame(myName, partnerName);
         }
     }
 
+    /**
+     * Выводит на экран сообщение о закрытии игры и закрывает приложение
+     * После этого освободятся ресурсы (классы ClientSettingsController и ServerSettingsController
+     * добавили к используемому объекту Stage обработчики закрытия приложения)
+     *
+     * @param cause имя игрока, инициировавшего закрытие приложения
+     */
     private void onDisconnect(String cause) {
         var message = String.format("%s: Stop game! Ok?", cause);
         new Alert(Alert.AlertType.ERROR, message, ButtonType.OK).showAndWait();
         Platform.exit();
     }
 
+    /**
+     * Метод, меняющий текущую сцену на экран игры
+     *
+     * @param myName наше имя
+     * @param partnerName имя партнёра
+     */
     private void showGame(String myName, String partnerName) {
         receiveMessageService.cancel();
 
-        var stage = (Stage)okButton.getScene().getWindow();
+        var stage = (Stage) okButton.getScene().getWindow();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/game.fxml"));
         loader.setControllerFactory(cls ->
                 new GameController(ocean, myName, partnerName, inputStream, outputStream, isMyTurn));
@@ -104,7 +134,14 @@ public class GreetingsController implements Initializable {
         }
     }
 
+    /**
+     * Обработчик нажатия кнопки ОК
+     * После нажатия сопернику отправляется наше имя
+     *
+     * @param actionEvent не используется
+     */
     public void onOkButtonAction(ActionEvent actionEvent) {
+        // кнопку больше нельзя нажать
         okButton.disableProperty().unbind();
         okButton.setDisable(true);
 
@@ -112,6 +149,12 @@ public class GreetingsController implements Initializable {
         sendMessageService.send(name);
     }
 
+    /**
+     * Обработчик нажатия кнопки Cancel
+     * После нажатия показывается диалоговое окно и приложение закрывается
+     *
+     * @param actionEvent не используется
+     */
     public void onCancelButtonAction(ActionEvent actionEvent) {
         receiveMessageService.setOnFailed(null);
         sendMessageService.setOnFailed(null);

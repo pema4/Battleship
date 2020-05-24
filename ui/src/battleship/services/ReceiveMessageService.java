@@ -6,6 +6,10 @@ import javafx.concurrent.Task;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
+/**
+ * Сервис, получающий объект от соперника в отдельном потоке
+ * Сервисы позволяют задавать действия, выполняемые в UI потоке после своего успешного завершения/ошибки
+ */
 public class ReceiveMessageService extends Service<Object> {
     private final ObjectInputStream inputStream;
 
@@ -18,11 +22,7 @@ public class ReceiveMessageService extends Service<Object> {
         return new Task<>() {
             @Override
             protected Object call() throws Exception {
-                try {
-                    return inputStream.readObject();
-                } catch (IOException ex) {
-                    throw ex;
-                }
+                return inputStream.readObject();
             }
         };
     }

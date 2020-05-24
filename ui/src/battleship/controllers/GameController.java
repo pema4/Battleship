@@ -29,7 +29,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 /**
- * Controller for Game view
+ * Контроллер для экрана игры
  */
 public class GameController implements Initializable {
     private final Ocean ocean;
@@ -37,8 +37,6 @@ public class GameController implements Initializable {
     private final String partnerName;
     private final SendMessageService sendMessageService;
     private final ReceiveMessageService receiveMessageService;
-    private final ObjectInputStream inputStream;
-    private final ObjectOutputStream outputStream;
     private final boolean[][] alreadyShot = new boolean[Ocean.OCEAN_WIDTH][Ocean.OCEAN_HEIGHT];
     private boolean isMyTurn;
     private int myShots = 0;
@@ -59,26 +57,24 @@ public class GameController implements Initializable {
         this.ocean = ocean;
         this.myName = myName;
         this.partnerName = partnerName;
-        this.inputStream = inputStream;
-        this.outputStream = outputStream;
         this.isMyTurn = isMyTurn;
         receiveMessageService = new ReceiveMessageService(inputStream);
         sendMessageService = new SendMessageService(outputStream);
     }
 
+    /**
+     * Выводит на экран сообщение о закрытии игры и закрывает приложение
+     * После этого освободятся ресурсы (классы ClientSettingsController и ServerSettingsController
+     * добавили к используемому объекту Stage обработчики закрытия приложения)
+     *
+     * @param cause имя игрока, инициировавшего закрытие приложения
+     */
     private void onDisconnect(String cause) {
         var message = String.format("%s: Stop game! Ok?", cause);
         new Alert(Alert.AlertType.ERROR, message, ButtonType.OK).showAndWait();
         Platform.exit();
     }
 
-
-    /**
-     * Method called from FXMLoader
-     *
-     * @param url            not used
-     * @param resourceBundle not used
-     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         bindOutput();
@@ -95,6 +91,11 @@ public class GameController implements Initializable {
         receiveMessageService.start();
     }
 
+    /**
+     * Метод, вызываемый после успешной отправки сообщения
+     *
+     * @param message отправленное сообщение
+     */
     private void onMessageSent(Object message) {
         if (message instanceof ShotResponse) {
             // обновляем своё игровое поле
@@ -102,6 +103,11 @@ public class GameController implements Initializable {
         }
     }
 
+    /**
+     * Метод, вызываемый после получения сообщения
+     *
+     * @param message полученное сообщение
+     */
     private void onMessageReceived(Object message) {
         if (message instanceof ShotRequest) {
             // вычисляем ответ и отправляем его
@@ -124,6 +130,11 @@ public class GameController implements Initializable {
         receiveMessageService.restart();
     }
 
+    /**
+     * Метод, вызываемый после получения ответа на выстрел по полю противника
+     *
+     * @param response ответ противника
+     */
     private void onShotResponseReceived(ShotResponse response) {
         myShots += 1;
         int x = response.getRequest().getX();
@@ -143,12 +154,18 @@ public class GameController implements Initializable {
                         partnerField.paintCell(ship.getBowRow() + i, ship.getBowColumn() + j, Field.DESTROYED_WHOLE_SHIP_BACKGROUND);
         }
 
-        System.out.println(String.format("%s: (%d, %d) = %s", partnerName, x, y, response.getType()));
+        System.out.println(String.format("%s: (%d, %d) = %s", partnerName, y, x, response.getType()));
 
+        // Если игра закончилась - показываем экран с результатами игры
         if (response.getType() == ShotResponse.Type.SUNK_ALL)
             showGameResults(myName);
     }
 
+    /**
+     * Метод вызываемый после отправки ответа на выстрел по нашему полю
+     *
+     * @param response наш ответ
+     */
     private void onShotRequestReceived(ShotResponse response) {
         int x = response.getRequest().getX();
         int y = response.getRequest().getY();
@@ -163,7 +180,7 @@ public class GameController implements Initializable {
                 break;
         }
 
-        System.out.println(String.format("%s: (%d, %d) = %s", myName, x, y, response.getType()));
+        System.out.println(String.format("%s: (%d, %d) = %s", myName, y, x, response.getType()));
 
         if (response.getType() == ShotResponse.Type.SUNK_ALL)
             showGameResults(partnerName);
@@ -171,6 +188,12 @@ public class GameController implements Initializable {
             isMyTurn = true;
     }
 
+    /**
+     * Метод, стреляющий по нашему объекту Ocean и возвращающий результат
+     *
+     * @param request куда стрелять
+     * @return ответ на выстрел
+     */
     private ShotResponse shootAt(ShotRequest request) {
         int x = request.getX();
         int y = request.getY();
@@ -188,7 +211,7 @@ public class GameController implements Initializable {
     }
 
     /**
-     * Binds stdout to TextArea.
+     * Перенаправляет stdout в TextField
      */
     private void bindOutput() {
         var out = new OutputStream() {
@@ -206,6 +229,9 @@ public class GameController implements Initializable {
         System.setOut(new PrintStream(out, true));
     }
 
+    /**
+     * Проигрывает анимацию ошибки
+     */
     private void highlightError() {
         var animation = new Timeline(
                 new KeyFrame(Duration.seconds(0.05), new KeyValue(redBlendEffect.opacityProperty(), 0.3)),
@@ -214,6 +240,11 @@ public class GameController implements Initializable {
         animation.play();
     }
 
+    /**
+     * Вызывается при выстреле по полю противника
+     *
+     * @param shotEvent куда произведён выстрел
+     */
     public void onShotHandler(ShotEvent shotEvent) {
         int x = shotEvent.getX();
         int y = shotEvent.getY();
@@ -225,8 +256,13 @@ public class GameController implements Initializable {
             highlightError();
     }
 
+    /**
+     * Показывает экран с результатами игры
+     *
+     * @param winnerName имя победителя
+     */
     private void showGameResults(String winnerName) {
-        var stage = (Stage)myField.getScene().getWindow();
+        var stage = (Stage) myField.getScene().getWindow();
         var loader = new FXMLLoader(getClass().getResource("/fxml/results.fxml"));
         try {
             loader.setControllerFactory(cls ->
@@ -239,7 +275,13 @@ public class GameController implements Initializable {
         }
     }
 
-    public void onCancelAction(ActionEvent actionEvent) throws IOException {
+    /**
+     * Обработчик нажатия кнопки отмена
+     *
+     * @param actionEvent не используется
+     */
+    public void onCancelAction(ActionEvent actionEvent) {
+        // эти обработчики вызывать не нужно
         receiveMessageService.setOnFailed(null);
         sendMessageService.setOnFailed(null);
         onDisconnect(myName);
